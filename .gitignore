@@ -1,0 +1,11 @@
+dist/
+terraform-provider-vidos
+.terraformrc.dev
+go.work*
+.DS_Store
+.idea/
+bin/
+
+# coverage artifacts
+coverage.out
+coverage.html
