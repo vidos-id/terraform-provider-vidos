@@ -3,7 +3,8 @@ terraform {
 
   required_providers {
     vidos = {
-      source = "vidos/vidos"
+      source  = "registry.terraform.io/vidos-id/vidos"
+      version = "~> 0.1"
     }
   }
 }

@@ -28,7 +28,7 @@ go build -ldflags "-X main.version=1.0.0" -o ./bin/terraform-provider-vidos .
 ```hcl
 provider_installation {
   dev_overrides {
-    "vidos/vidos" = "/ABSOLUTE/PATH/TO/verified-os/tools/terraform-provider-vidos/bin"
+    "registry.terraform.io/vidos-id/vidos" = "/ABSOLUTE/PATH/TO/verified-os/tools/terraform-provider-vidos/bin"
   }
 
   direct {}

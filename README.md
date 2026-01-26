@@ -1,6 +1,30 @@
 # Terraform Provider: vidos
 
+[![Terraform Registry](https://img.shields.io/badge/terraform-registry-blue.svg)](https://registry.terraform.io/providers/vidos-id/vidos/latest)
+
 This is a Terraform provider for administering the Vidos platform via **management APIs only**.
+
+## Installation
+
+This provider is published to the [Terraform Registry](https://registry.terraform.io/providers/vidos-id/vidos/latest).
+
+### From Terraform Registry (Recommended)
+
+```hcl
+terraform {
+  required_providers {
+    vidos = {
+      source  = "registry.terraform.io/vidos-id/vidos"
+      version = "~> 0.1"
+    }
+  }
+}
+```
+
+### Requirements
+
+- Terraform 1.0+
+- Go 1.21+ (for local development)
 
 ## Scope (v1)
 
@@ -66,14 +90,16 @@ Environment variables:
 - Attachments fail fast: before attaching, the provider verifies that the policy exists.
 - For resources that accept `resource_id`, it is optional and immutable. If omitted, the provider will generate a stable `tf-<hex>` id on create.
 
-## Local build
+## Development
+
+### Local build
 
 ```bash
 go mod tidy
 go build -ldflags "-X main.version=1.0.0" -o ./bin/terraform-provider-vidos .
 ```
 
-## Unit tests
+### Unit tests
 
 All unit tests run offline by mocking HTTP using `http.RoundTripper`.
 
@@ -87,3 +113,11 @@ make coverprofile
 # Coverage profile + gate (minimum configured in `.testcoverage.yml`)
 make coverage
 ```
+
+## Contributing
+
+Contributions are welcome! Please see the [GitHub repository](https://github.com/vidos-id/terraform-provider-vidos) for more information.
+
+## License
+
+This project is licensed under the Apache License 2.0 - see the [LICENSE](LICENSE) file for details.
