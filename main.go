@@ -20,7 +20,7 @@ func main() {
 	flag.Parse()
 
 	if err := providerserver.Serve(context.Background(), New, providerserver.ServeOpts{
-		Address: "registry.terraform.io/vidos/vidos",
+		Address: "registry.terraform.io/vidos-id/vidos",
 		Debug:   debug,
 	}); err != nil {
 		log.Fatal(err)
