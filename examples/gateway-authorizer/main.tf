@@ -20,14 +20,6 @@ resource "vidos_authorizer_configuration" "example" {
   name = "terraform-example-authorizer-config"
 
   values = jsonencode({
-    policies = {
-      verify = {
-        skip = true
-      }
-      validate = {
-        skip = true
-      }
-    }
   })
 }
 
@@ -43,6 +35,7 @@ resource "vidos_gateway_instance" "example" {
     cors = {
       enabled      = true
       allowHeaders = ["*"]
+      origin       = ["*"]
     }
     paths = {
       # Requests to /auth/* are forwarded to the authorizer instance.
