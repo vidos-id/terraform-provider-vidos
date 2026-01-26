@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"net/url"
+	"strings"
 
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
@@ -55,7 +56,17 @@ func deleteConfiguration(ctx context.Context, client *APIClient, baseURL, resour
 	configurationURL := joinURL(baseURL, fmt.Sprintf("/configurations/%s", url.PathEscape(resourceID)))
 	_, status, diags := client.doJSONInternal(ctx, "DELETE", configurationURL, nil, nil, true)
 	if diags.HasError() {
-		if status == 409 {
+		isInUse := false
+		for _, d := range diags.Errors() {
+			detail := d.Detail()
+			// The API sometimes returns "InUse" as HTTP 409, but it has also been observed
+			// as a 5xx with a friendly error code. Keep guidance keyed off the code.
+			if strings.Contains(detail, "(InUse)") || strings.Contains(detail, "\"code\":\"InUse\"") {
+				isInUse = true
+				break
+			}
+		}
+		if status == 409 || isInUse {
 			diags.AddError(
 				"Configuration still in use",
 				"This configuration is still referenced by one or more instances. Terraform must first update those instances to stop using it (set configuration_resource_id to null or a different configuration), then delete the configuration in a subsequent apply.",
