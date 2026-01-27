@@ -59,6 +59,7 @@ func (r *ValidatorInstanceResource) Schema(_ context.Context, _ resource.SchemaR
 					stringplanmodifier.UseStateForUnknown(),
 				},
 			},
+			"endpoint": instanceEndpointSchemaAttribute(),
 		},
 	}
 }

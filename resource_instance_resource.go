@@ -165,6 +165,7 @@ func (r *instanceResource) readIntoState(ctx context.Context, resourceID string,
 	} else {
 		state.InlineConfiguration = types.StringValue(inlineJSON)
 	}
+	state.Endpoint = instanceEndpointToState(out.Instance.Endpoint)
 
 	return true, diags
 }

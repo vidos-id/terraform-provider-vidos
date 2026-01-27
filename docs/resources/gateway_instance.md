@@ -21,6 +21,14 @@ resource "vidos_gateway_instance" "example" {
 }
 ```
 
+## Output Example
+
+```hcl
+output "gateway_endpoint" {
+  value = vidos_gateway_instance.example.endpoint
+}
+```
+
 ## Argument Reference
 
 - `name` (required) – Name of the gateway instance
@@ -31,6 +39,7 @@ resource "vidos_gateway_instance" "example" {
 ## Attributes Reference
 
 - `resource_id` – Unique identifier for the gateway instance (read-only if not provided)
+- `endpoint` – Platform-reported gateway endpoint (read-only)
 
 ## Import
 

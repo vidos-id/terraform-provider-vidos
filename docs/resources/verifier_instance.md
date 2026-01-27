@@ -26,6 +26,14 @@ resource "vidos_verifier_instance" "example" {
 }
 ```
 
+## Output Example
+
+```hcl
+output "verifier_endpoint" {
+  value = vidos_verifier_instance.example.endpoint
+}
+```
+
 ## Argument Reference
 
 - `name` (required) – Name of the verifier instance
@@ -36,6 +44,7 @@ resource "vidos_verifier_instance" "example" {
 ## Attributes Reference
 
 - `resource_id` – Unique identifier for the verifier instance (read-only if not provided)
+- `endpoint` – Platform-reported verifier endpoint (read-only)
 
 ## Import
 

@@ -59,6 +59,7 @@ func (r *ResolverInstanceResource) Schema(_ context.Context, _ resource.SchemaRe
 					stringplanmodifier.UseStateForUnknown(),
 				},
 			},
+			"endpoint": instanceEndpointSchemaAttribute(),
 		},
 	}
 }

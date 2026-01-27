@@ -27,6 +27,14 @@ resource "vidos_validator_instance" "example" {
 }
 ```
 
+## Output Example
+
+```hcl
+output "validator_endpoint" {
+  value = vidos_validator_instance.example.endpoint
+}
+```
+
 ## Argument Reference
 
 - `name` (required) – Name of the validator instance
@@ -37,6 +45,7 @@ resource "vidos_validator_instance" "example" {
 ## Attributes Reference
 
 - `resource_id` – Unique identifier for the validator instance (read-only if not provided)
+- `endpoint` – Platform-reported validator endpoint (read-only)
 
 ## Import
 
