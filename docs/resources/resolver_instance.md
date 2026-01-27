@@ -27,6 +27,14 @@ resource "vidos_resolver_instance" "example" {
 }
 ```
 
+## Output Example
+
+```hcl
+output "resolver_endpoint" {
+  value = vidos_resolver_instance.example.endpoint
+}
+```
+
 ## Argument Reference
 
 - `name` (required) – Name of the resolver instance
@@ -37,6 +45,7 @@ resource "vidos_resolver_instance" "example" {
 ## Attributes Reference
 
 - `resource_id` – Unique identifier for the resolver instance (read-only if not provided)
+- `endpoint` – Platform-reported resolver endpoint (read-only)
 
 ## Import
 

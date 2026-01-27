@@ -58,7 +58,7 @@ func TestInstanceResource_Create_SendsExpectedPayload(t *testing.T) {
 		if r.Method != http.MethodGet {
 			return httpResponse(500, nil, "unexpected"), nil
 		}
-		return httpResponse(200, nil, `{"instance":{"resourceId":"tf-abc","name":"n","configurationResourceId":"cid","inlineConfiguration":null}}`), nil
+		return httpResponse(200, nil, `{"instance":{"resourceId":"tf-abc","name":"n","configurationResourceId":"cid","inlineConfiguration":null,"endpoint":"https://example.invalid"}}`), nil
 	}))
 
 	oldRead := cryptoRandRead
@@ -78,8 +78,9 @@ func TestInstanceResource_Create_SendsExpectedPayload(t *testing.T) {
 		Name:                    types.StringValue("n"),
 		ConfigurationResourceID: types.StringValue("cid"),
 		InlineConfiguration:     types.StringNull(),
+		Endpoint:                types.StringNull(),
 	}
-	config := instanceModel{ResourceID: types.StringNull()}
+	config := instanceModel{ResourceID: types.StringNull(), Endpoint: types.StringNull()}
 
 	var resp resource.CreateResponse
 	initResourceState(t, &resp.State)
@@ -102,6 +103,21 @@ func TestInstanceResource_Create_SendsExpectedPayload(t *testing.T) {
 	if strings.Contains(gotBody, "inlineConfiguration") {
 		t.Fatalf("expected inlineConfiguration omitted when null")
 	}
+
+	var gotEndpoint types.String
+	resp.Diagnostics.Append(resp.State.GetAttribute(context.Background(), path.Root("endpoint"), &gotEndpoint)...)
+	if resp.Diagnostics.HasError() {
+		t.Fatalf("unexpected diagnostics: %#v", resp.Diagnostics)
+	}
+	if gotEndpoint.IsUnknown() {
+		t.Fatalf("expected endpoint not unknown")
+	}
+	if gotEndpoint.IsNull() {
+		t.Fatalf("expected endpoint set")
+	}
+	if gotEndpoint.ValueString() != "https://example.invalid" {
+		t.Fatalf("unexpected endpoint in state: %q", gotEndpoint.ValueString())
+	}
 }
 
 func TestInstanceResource_Create_NullConfigurationResourceIdSendsExplicitNull(t *testing.T) {
@@ -115,7 +131,7 @@ func TestInstanceResource_Create_NullConfigurationResourceIdSendsExplicitNull(t 
 			gotBody = string(b)
 			return httpResponse(200, nil, `{}`), nil
 		}
-		return httpResponse(200, nil, `{"instance":{"resourceId":"rid","name":"n","configurationResourceId":"","inlineConfiguration":null}}`), nil
+		return httpResponse(200, nil, `{"instance":{"resourceId":"rid","name":"n","configurationResourceId":"","inlineConfiguration":null,"endpoint":"https://example.invalid"}}`), nil
 	}))
 
 	r := &instanceResource{client: c, baseURL: func(*APIClient) string { return "https://example.com" }}
@@ -125,8 +141,9 @@ func TestInstanceResource_Create_NullConfigurationResourceIdSendsExplicitNull(t 
 		Name:                    types.StringValue("n"),
 		ConfigurationResourceID: types.StringNull(),
 		InlineConfiguration:     types.StringNull(),
+		Endpoint:                types.StringNull(),
 	}
-	config := instanceModel{ResourceID: types.StringValue("rid")}
+	config := instanceModel{ResourceID: types.StringValue("rid"), Endpoint: types.StringNull()}
 
 	var resp resource.CreateResponse
 	initResourceState(t, &resp.State)
@@ -152,8 +169,9 @@ func TestInstanceResource_Create_InlineConfigurationInvalidJSONAddsDiagnostics(t
 		Name:                    types.StringValue("n"),
 		ConfigurationResourceID: types.StringNull(),
 		InlineConfiguration:     types.StringValue("not-json"),
+		Endpoint:                types.StringNull(),
 	}
-	config := instanceModel{ResourceID: types.StringValue("rid")}
+	config := instanceModel{ResourceID: types.StringValue("rid"), Endpoint: types.StringNull()}
 
 	var resp resource.CreateResponse
 	initResourceState(t, &resp.State)
@@ -174,12 +192,18 @@ func TestInstanceResource_Create_InlineConfigurationIncludedWhenSet(t *testing.T
 			gotBody = string(b)
 			return httpResponse(200, nil, `{}`), nil
 		}
-		return httpResponse(200, nil, `{"instance":{"resourceId":"rid","name":"n","configurationResourceId":"","inlineConfiguration":{}}}`), nil
+		return httpResponse(200, nil, `{"instance":{"resourceId":"rid","name":"n","configurationResourceId":"","inlineConfiguration":{},"endpoint":"https://example.invalid"}}`), nil
 	}))
 
 	r := &instanceResource{client: c, baseURL: func(*APIClient) string { return "https://example.com" }}
-	plan := instanceModel{ResourceID: types.StringValue("rid"), Name: types.StringValue("n"), ConfigurationResourceID: types.StringNull(), InlineConfiguration: types.StringValue(`{"a":1}`)}
-	config := instanceModel{ResourceID: types.StringValue("rid")}
+	plan := instanceModel{
+		ResourceID:              types.StringValue("rid"),
+		Name:                    types.StringValue("n"),
+		ConfigurationResourceID: types.StringNull(),
+		InlineConfiguration:     types.StringValue(`{"a":1}`),
+		Endpoint:                types.StringNull(),
+	}
+	config := instanceModel{ResourceID: types.StringValue("rid"), Endpoint: types.StringNull()}
 
 	var resp resource.CreateResponse
 	initResourceState(t, &resp.State)
@@ -203,11 +227,17 @@ func TestInstanceResource_Update_OmitsInlineConfigurationWhenNull(t *testing.T) 
 			gotBody = string(b)
 			return httpResponse(204, nil, ``), nil
 		}
-		return httpResponse(200, nil, `{"instance":{"resourceId":"rid","name":"n","configurationResourceId":"","inlineConfiguration":null}}`), nil
+		return httpResponse(200, nil, `{"instance":{"resourceId":"rid","name":"n","configurationResourceId":"","inlineConfiguration":null,"endpoint":"https://example.invalid"}}`), nil
 	}))
 
 	r := &instanceResource{client: c, baseURL: func(*APIClient) string { return "https://example.com" }}
-	plan := instanceModel{ResourceID: types.StringValue("rid"), Name: types.StringValue("n"), ConfigurationResourceID: types.StringNull(), InlineConfiguration: types.StringNull()}
+	plan := instanceModel{
+		ResourceID:              types.StringValue("rid"),
+		Name:                    types.StringValue("n"),
+		ConfigurationResourceID: types.StringNull(),
+		InlineConfiguration:     types.StringNull(),
+		Endpoint:                types.StringNull(),
+	}
 
 	var resp resource.UpdateResponse
 	initResourceState(t, &resp.State)
@@ -234,11 +264,17 @@ func TestInstanceResource_Update_OmitsFieldsWhenUnknown(t *testing.T) {
 			gotBody = string(b)
 			return httpResponse(204, nil, ``), nil
 		}
-		return httpResponse(200, nil, `{"instance":{"resourceId":"rid","name":"n","configurationResourceId":"","inlineConfiguration":null}}`), nil
+		return httpResponse(200, nil, `{"instance":{"resourceId":"rid","name":"n","configurationResourceId":"","inlineConfiguration":null,"endpoint":"https://example.invalid"}}`), nil
 	}))
 
 	r := &instanceResource{client: c, baseURL: func(*APIClient) string { return "https://example.com" }}
-	plan := instanceModel{ResourceID: types.StringValue("rid"), Name: types.StringValue("n"), ConfigurationResourceID: types.StringUnknown(), InlineConfiguration: types.StringUnknown()}
+	plan := instanceModel{
+		ResourceID:              types.StringValue("rid"),
+		Name:                    types.StringValue("n"),
+		ConfigurationResourceID: types.StringUnknown(),
+		InlineConfiguration:     types.StringUnknown(),
+		Endpoint:                types.StringNull(),
+	}
 
 	var resp resource.UpdateResponse
 	initResourceState(t, &resp.State)
@@ -270,6 +306,7 @@ func TestInstanceResource_Update_InvalidInlineConfigurationJSONAddsDiagnostics_N
 		Name:                    types.StringValue("n"),
 		ConfigurationResourceID: types.StringValue("cid"),
 		InlineConfiguration:     types.StringValue(`{bad json}`),
+		Endpoint:                types.StringNull(),
 	}
 
 	var resp resource.UpdateResponse
@@ -294,7 +331,7 @@ func TestInstanceResource_Update_InlineConfigurationIncludedWhenSet(t *testing.T
 			gotBody = string(b)
 			return httpResponse(204, nil, ``), nil
 		}
-		return httpResponse(200, nil, `{"instance":{"resourceId":"rid","name":"n","configurationResourceId":"","inlineConfiguration":{}}}`), nil
+		return httpResponse(200, nil, `{"instance":{"resourceId":"rid","name":"n","configurationResourceId":"","inlineConfiguration":{},"endpoint":"https://example.invalid"}}`), nil
 	}))
 
 	r := &instanceResource{client: c, baseURL: func(*APIClient) string { return "https://example.com" }}
@@ -303,6 +340,7 @@ func TestInstanceResource_Update_InlineConfigurationIncludedWhenSet(t *testing.T
 		Name:                    types.StringValue("n"),
 		ConfigurationResourceID: types.StringNull(),
 		InlineConfiguration:     types.StringValue(`{"a":1}`),
+		Endpoint:                types.StringNull(),
 	}
 
 	var resp resource.UpdateResponse
@@ -330,7 +368,7 @@ func TestInstanceResource_Update_NullConfigurationResourceIdSendsExplicitNull(t 
 			gotBody = string(b)
 			return httpResponse(204, nil, ``), nil
 		}
-		return httpResponse(200, nil, `{"instance":{"resourceId":"rid","name":"n","configurationResourceId":"","inlineConfiguration":null}}`), nil
+		return httpResponse(200, nil, `{"instance":{"resourceId":"rid","name":"n","configurationResourceId":"","inlineConfiguration":null,"endpoint":"https://example.invalid"}}`), nil
 	}))
 
 	r := &instanceResource{client: c, baseURL: func(*APIClient) string { return "https://example.com" }}
@@ -339,6 +377,7 @@ func TestInstanceResource_Update_NullConfigurationResourceIdSendsExplicitNull(t 
 		Name:                    types.StringValue("n"),
 		ConfigurationResourceID: types.StringNull(),
 		InlineConfiguration:     types.StringNull(),
+		Endpoint:                types.StringNull(),
 	}
 
 	var resp resource.UpdateResponse
@@ -361,7 +400,7 @@ func TestInstanceResource_Read_NotFoundRemovesResource(t *testing.T) {
 		return httpResponse(404, nil, `{"code":"NotFound","message":"missing"}`), nil
 	}))
 
-	state := instanceModel{ResourceID: types.StringValue("rid"), Name: types.StringValue("n")}
+	state := instanceModel{ResourceID: types.StringValue("rid"), Name: types.StringValue("n"), Endpoint: types.StringNull()}
 	var resp resource.ReadResponse
 	initResourceState(t, &resp.State)
 	r.Read(context.Background(), resource.ReadRequest{State: instanceState(t, state)}, &resp)
@@ -371,6 +410,99 @@ func TestInstanceResource_Read_NotFoundRemovesResource(t *testing.T) {
 	}
 	if !resp.State.Raw.IsNull() {
 		t.Fatalf("expected state removed")
+	}
+}
+
+func TestInstanceResource_Read_EndpointEmptyMapsToNull(t *testing.T) {
+	r := &instanceResource{baseURL: func(*APIClient) string { return "https://example.com" }}
+	r.client = newTestClient(roundTripperFunc(func(req *http.Request) (*http.Response, error) {
+		if req.Method != http.MethodGet {
+			return httpResponse(500, nil, "unexpected"), nil
+		}
+		return httpResponse(200, nil, `{"instance":{"resourceId":"rid","name":"n","configurationResourceId":"","inlineConfiguration":null,"endpoint":""}}`), nil
+	}))
+
+	state := instanceModel{ResourceID: types.StringValue("rid"), Name: types.StringValue("n"), Endpoint: types.StringValue("https://old.invalid")}
+	var resp resource.ReadResponse
+	initResourceState(t, &resp.State)
+	r.Read(context.Background(), resource.ReadRequest{State: instanceState(t, state)}, &resp)
+
+	if resp.Diagnostics.HasError() {
+		t.Fatalf("unexpected diagnostics: %#v", resp.Diagnostics)
+	}
+
+	var got types.String
+	resp.Diagnostics.Append(resp.State.GetAttribute(context.Background(), path.Root("endpoint"), &got)...)
+	if resp.Diagnostics.HasError() {
+		t.Fatalf("unexpected diagnostics: %#v", resp.Diagnostics)
+	}
+	if got.IsUnknown() {
+		t.Fatalf("expected endpoint not unknown")
+	}
+	if !got.IsNull() {
+		t.Fatalf("expected endpoint null")
+	}
+}
+
+func TestInstanceResource_Read_EndpointUpdatesWhenAPIChanges(t *testing.T) {
+	var calls int
+
+	r := &instanceResource{baseURL: func(*APIClient) string { return "https://example.com" }}
+	r.client = newTestClient(roundTripperFunc(func(req *http.Request) (*http.Response, error) {
+		calls++
+		if req.Method != http.MethodGet {
+			return httpResponse(500, nil, "unexpected"), nil
+		}
+		if calls == 1 {
+			return httpResponse(200, nil, `{"instance":{"resourceId":"rid","name":"n","configurationResourceId":"","inlineConfiguration":null,"endpoint":"https://one.invalid"}}`), nil
+		}
+		return httpResponse(200, nil, `{"instance":{"resourceId":"rid","name":"n","configurationResourceId":"","inlineConfiguration":null,"endpoint":"https://two.invalid"}}`), nil
+	}))
+
+	state := instanceModel{ResourceID: types.StringValue("rid"), Name: types.StringValue("n"), Endpoint: types.StringNull()}
+
+	// First read sets endpoint.
+	{
+		var resp resource.ReadResponse
+		initResourceState(t, &resp.State)
+		r.Read(context.Background(), resource.ReadRequest{State: instanceState(t, state)}, &resp)
+		if resp.Diagnostics.HasError() {
+			t.Fatalf("unexpected diagnostics: %#v", resp.Diagnostics)
+		}
+
+		var got types.String
+		resp.Diagnostics.Append(resp.State.GetAttribute(context.Background(), path.Root("endpoint"), &got)...)
+		if resp.Diagnostics.HasError() {
+			t.Fatalf("unexpected diagnostics: %#v", resp.Diagnostics)
+		}
+		if got.IsNull() || got.IsUnknown() || got.ValueString() != "https://one.invalid" {
+			t.Fatalf("unexpected endpoint after first read: %#v", got)
+		}
+
+		// Carry forward updated state.
+		resp.Diagnostics.Append(resp.State.Get(context.Background(), &state)...)
+		if resp.Diagnostics.HasError() {
+			t.Fatalf("unexpected diagnostics: %#v", resp.Diagnostics)
+		}
+	}
+
+	// Second read updates endpoint.
+	{
+		var resp resource.ReadResponse
+		initResourceState(t, &resp.State)
+		r.Read(context.Background(), resource.ReadRequest{State: instanceState(t, state)}, &resp)
+		if resp.Diagnostics.HasError() {
+			t.Fatalf("unexpected diagnostics: %#v", resp.Diagnostics)
+		}
+
+		var got types.String
+		resp.Diagnostics.Append(resp.State.GetAttribute(context.Background(), path.Root("endpoint"), &got)...)
+		if resp.Diagnostics.HasError() {
+			t.Fatalf("unexpected diagnostics: %#v", resp.Diagnostics)
+		}
+		if got.IsNull() || got.IsUnknown() || got.ValueString() != "https://two.invalid" {
+			t.Fatalf("unexpected endpoint after second read: %#v", got)
+		}
 	}
 }
 
@@ -390,7 +522,7 @@ func TestInstanceResource_Delete_DelegatesToDeleteInstance(t *testing.T) {
 	t.Cleanup(func() { instanceSleepFn = oldSleep })
 
 	r := &instanceResource{client: c, baseURL: func(*APIClient) string { return "https://example.com" }}
-	state := instanceModel{ResourceID: types.StringValue("rid"), Name: types.StringValue("n")}
+	state := instanceModel{ResourceID: types.StringValue("rid"), Name: types.StringValue("n"), Endpoint: types.StringNull()}
 
 	var resp resource.DeleteResponse
 	initResourceState(t, &resp.State)

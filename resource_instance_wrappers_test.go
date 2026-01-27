@@ -1,6 +1,12 @@
 package main
 
-import "testing"
+import (
+	"context"
+	"testing"
+
+	"github.com/hashicorp/terraform-plugin-framework/resource"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
+)
 
 func TestInstanceWrappers_BaseURLWiring(t *testing.T) {
 	client := &APIClient{cfg: providerConfig{domain: "example.com", defaultRegion: "eu"}}
@@ -52,6 +58,58 @@ func TestInstanceWrappers_BaseURLWiring(t *testing.T) {
 		}
 		if got := r.baseURL(client); got != "https://verifier.management.eu.example.com" {
 			t.Fatalf("unexpected verifier baseURL: %q", got)
+		}
+	}
+}
+
+func TestInstanceWrappers_EndpointSchemaIsComputedNotSensitive(t *testing.T) {
+	resources := []struct {
+		name string
+		r    func() schema.Schema
+	}{
+		{"gateway", func() schema.Schema {
+			var resp resource.SchemaResponse
+			NewGatewayInstanceResource().Schema(context.Background(), resource.SchemaRequest{}, &resp)
+			return resp.Schema
+		}},
+		{"authorizer", func() schema.Schema {
+			var resp resource.SchemaResponse
+			NewAuthorizerInstanceResource().Schema(context.Background(), resource.SchemaRequest{}, &resp)
+			return resp.Schema
+		}},
+		{"validator", func() schema.Schema {
+			var resp resource.SchemaResponse
+			NewValidatorInstanceResource().Schema(context.Background(), resource.SchemaRequest{}, &resp)
+			return resp.Schema
+		}},
+		{"verifier", func() schema.Schema {
+			var resp resource.SchemaResponse
+			NewVerifierInstanceResource().Schema(context.Background(), resource.SchemaRequest{}, &resp)
+			return resp.Schema
+		}},
+		{"resolver", func() schema.Schema {
+			var resp resource.SchemaResponse
+			NewResolverInstanceResource().Schema(context.Background(), resource.SchemaRequest{}, &resp)
+			return resp.Schema
+		}},
+	}
+
+	for _, tt := range resources {
+		s := tt.r()
+		attr, ok := s.Attributes["endpoint"]
+		if !ok {
+			t.Fatalf("%s: expected endpoint attribute", tt.name)
+		}
+
+		stringAttr, ok := attr.(schema.StringAttribute)
+		if !ok {
+			t.Fatalf("%s: expected endpoint to be StringAttribute", tt.name)
+		}
+		if !stringAttr.Computed {
+			t.Fatalf("%s: expected endpoint Computed", tt.name)
+		}
+		if stringAttr.Sensitive {
+			t.Fatalf("%s: expected endpoint not Sensitive", tt.name)
 		}
 	}
 }

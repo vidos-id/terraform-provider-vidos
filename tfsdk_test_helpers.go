@@ -17,6 +17,7 @@ func instanceSchema() schema.Schema {
 			"name":                      schema.StringAttribute{Required: true},
 			"configuration_resource_id": schema.StringAttribute{Optional: true},
 			"inline_configuration":      schema.StringAttribute{Optional: true, Computed: true},
+			"endpoint":                  schema.StringAttribute{Computed: true},
 		},
 	}
 }
@@ -31,6 +32,7 @@ func instanceConfig(t *testing.T, v instanceModel) tfsdk.Config {
 		"name":                      tftypes.String,
 		"configuration_resource_id": tftypes.String,
 		"inline_configuration":      tftypes.String,
+		"endpoint":                  tftypes.String,
 	}
 
 	ridTF, err := v.ResourceID.ToTerraformValue(ctx)
@@ -49,6 +51,10 @@ func instanceConfig(t *testing.T, v instanceModel) tfsdk.Config {
 	if err != nil {
 		t.Fatalf("inline_configuration ToTerraformValue: %s", err)
 	}
+	endpointTF, err := v.Endpoint.ToTerraformValue(ctx)
+	if err != nil {
+		t.Fatalf("endpoint ToTerraformValue: %s", err)
+	}
 
 	return tfsdk.Config{
 		Schema: s,
@@ -59,6 +65,7 @@ func instanceConfig(t *testing.T, v instanceModel) tfsdk.Config {
 				"name":                      nameTF,
 				"configuration_resource_id": cidTF,
 				"inline_configuration":      inlineTF,
+				"endpoint":                  endpointTF,
 			},
 		),
 	}
@@ -74,6 +81,7 @@ func instancePlan(t *testing.T, v instanceModel) tfsdk.Plan {
 		"name":                      tftypes.String,
 		"configuration_resource_id": tftypes.String,
 		"inline_configuration":      tftypes.String,
+		"endpoint":                  tftypes.String,
 	}
 
 	ridTF, err := v.ResourceID.ToTerraformValue(ctx)
@@ -92,6 +100,10 @@ func instancePlan(t *testing.T, v instanceModel) tfsdk.Plan {
 	if err != nil {
 		t.Fatalf("inline_configuration ToTerraformValue: %s", err)
 	}
+	endpointTF, err := v.Endpoint.ToTerraformValue(ctx)
+	if err != nil {
+		t.Fatalf("endpoint ToTerraformValue: %s", err)
+	}
 
 	return tfsdk.Plan{
 		Schema: s,
@@ -102,6 +114,7 @@ func instancePlan(t *testing.T, v instanceModel) tfsdk.Plan {
 				"name":                      nameTF,
 				"configuration_resource_id": cidTF,
 				"inline_configuration":      inlineTF,
+				"endpoint":                  endpointTF,
 			},
 		),
 	}
@@ -117,6 +130,7 @@ func instanceState(t *testing.T, v instanceModel) tfsdk.State {
 		"name":                      tftypes.String,
 		"configuration_resource_id": tftypes.String,
 		"inline_configuration":      tftypes.String,
+		"endpoint":                  tftypes.String,
 	}
 
 	ridTF, err := v.ResourceID.ToTerraformValue(ctx)
@@ -135,6 +149,10 @@ func instanceState(t *testing.T, v instanceModel) tfsdk.State {
 	if err != nil {
 		t.Fatalf("inline_configuration ToTerraformValue: %s", err)
 	}
+	endpointTF, err := v.Endpoint.ToTerraformValue(ctx)
+	if err != nil {
+		t.Fatalf("endpoint ToTerraformValue: %s", err)
+	}
 
 	return tfsdk.State{
 		Schema: s,
@@ -145,6 +163,7 @@ func instanceState(t *testing.T, v instanceModel) tfsdk.State {
 				"name":                      nameTF,
 				"configuration_resource_id": cidTF,
 				"inline_configuration":      inlineTF,
+				"endpoint":                  endpointTF,
 			},
 		),
 	}

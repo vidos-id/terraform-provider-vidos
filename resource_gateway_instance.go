@@ -59,6 +59,7 @@ func (r *GatewayInstanceResource) Schema(_ context.Context, _ resource.SchemaReq
 					stringplanmodifier.UseStateForUnknown(),
 				},
 			},
+			"endpoint": instanceEndpointSchemaAttribute(),
 		},
 	}
 }

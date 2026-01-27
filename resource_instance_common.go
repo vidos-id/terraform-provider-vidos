@@ -7,6 +7,9 @@ import (
 	"time"
 
 	"github.com/hashicorp/terraform-plugin-framework/diag"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 )
 
@@ -23,6 +26,7 @@ type instanceModel struct {
 	Name                    types.String `tfsdk:"name"`
 	ConfigurationResourceID types.String `tfsdk:"configuration_resource_id"`
 	InlineConfiguration     types.String `tfsdk:"inline_configuration"`
+	Endpoint                types.String `tfsdk:"endpoint"`
 }
 
 type instanceReadResponse struct {
@@ -31,7 +35,26 @@ type instanceReadResponse struct {
 		Name                    string `json:"name"`
 		ConfigurationResourceID string `json:"configurationResourceId"`
 		InlineConfiguration     any    `json:"inlineConfiguration"`
+		Endpoint                string `json:"endpoint"`
 	} `json:"instance"`
+}
+
+func instanceEndpointToState(endpoint string) types.String {
+	if endpoint == "" {
+		return types.StringNull()
+	}
+	return types.StringValue(endpoint)
+}
+
+func instanceEndpointSchemaAttribute() schema.StringAttribute {
+	return schema.StringAttribute{
+		Computed:    true,
+		Sensitive:   false,
+		Description: "Platform-reported endpoint (pass-through).",
+		PlanModifiers: []planmodifier.String{
+			stringplanmodifier.UseStateForUnknown(),
+		},
+	}
 }
 
 func instanceCreatePayload(resourceID string, instance map[string]any) map[string]any {

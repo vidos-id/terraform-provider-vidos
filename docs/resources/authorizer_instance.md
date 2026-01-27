@@ -27,6 +27,14 @@ resource "vidos_authorizer_instance" "example" {
 }
 ```
 
+## Output Example
+
+```hcl
+output "authorizer_endpoint" {
+  value = vidos_authorizer_instance.example.endpoint
+}
+```
+
 ## Argument Reference
 
 - `name` (required) – Name of the authorizer instance
@@ -37,6 +45,7 @@ resource "vidos_authorizer_instance" "example" {
 ## Attributes Reference
 
 - `resource_id` – Unique identifier for the authorizer instance (read-only if not provided)
+- `endpoint` – Platform-reported authorizer endpoint (read-only)
 
 ## Import
 

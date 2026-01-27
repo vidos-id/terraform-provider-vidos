@@ -59,6 +59,7 @@ func (r *VerifierInstanceResource) Schema(_ context.Context, _ resource.SchemaRe
 					stringplanmodifier.UseStateForUnknown(),
 				},
 			},
+			"endpoint": instanceEndpointSchemaAttribute(),
 		},
 	}
 }

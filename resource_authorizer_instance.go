@@ -59,6 +59,7 @@ func (r *AuthorizerInstanceResource) Schema(_ context.Context, _ resource.Schema
 					stringplanmodifier.UseStateForUnknown(),
 				},
 			},
+			"endpoint": instanceEndpointSchemaAttribute(),
 		},
 	}
 }
