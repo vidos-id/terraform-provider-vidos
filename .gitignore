@@ -6,6 +6,14 @@ go.work*
 .idea/
 bin/
 
+# local tools
+.opencode/
+openspec/
+
 # coverage artifacts
 coverage.out
 coverage.html
+terraform.tfstate
+terraform.tfstate.backup
+.terraform.lock.hcl
+.terraform/

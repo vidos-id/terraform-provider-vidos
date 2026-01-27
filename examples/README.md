@@ -19,6 +19,8 @@ Each example directory is a standalone Terraform configuration that downloads th
 
 This example provisions both an authorizer and a gateway, and configures the gateway to route `/auth/*` to the authorizer instance using the managed service role `authorizer_all_actions`.
 
+Guide: `docs/guides/gateway-authorizer.md`
+
 ```bash
 cd examples/gateway-authorizer
 
@@ -32,6 +34,21 @@ terraform apply
 
 ```bash
 terraform destroy
+```
+
+### Gateway + Authorizer + Validator example
+
+This example provisions a validator (with inline trusted issuer roots including example PEMs), an authorizer configured to use that validator, and a gateway that routes `/auth/*` to the authorizer and `/validate/*` directly to the validator.
+
+Guide: `docs/guides/gateway-authorizer-validator.md`
+
+```bash
+cd examples/gateway-authorizer-validator
+
+export TF_VAR_vidos_api_key="<YOUR_VIDOS_IAM_API_SECRET>"
+
+terraform init
+terraform apply
 ```
 
 ## Notes

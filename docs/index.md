@@ -83,4 +83,10 @@ See the [CHANGELOG](https://github.com/vidos-id/terraform-provider-vidos/release
 
 See the [resources documentation](./resources/) for all supported resources.
 
+## Guides
+
+- [Guides index](./guides/)
+- [Gateway + Authorizer](./guides/gateway-authorizer.md)
+- [Gateway + Authorizer + Validator](./guides/gateway-authorizer-validator.md)
+
 For more details, visit the [Vidos documentation](https://vidos.id/docs).
