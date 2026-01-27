@@ -6,7 +6,7 @@ layout: guide
 
 # Gateway + Authorizer
 
-This guide explains the `examples/gateway-authorizer` configuration.
+This guide explains the [`examples/gateway-authorizer`](https://github.com/vidos-id/terraform-provider-vidos/tree/main/examples/gateway-authorizer) configuration.
 
 ## What it provisions
 
