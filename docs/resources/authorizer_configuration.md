@@ -16,12 +16,6 @@ resource "vidos_authorizer_configuration" "example" {
 
   values = jsonencode({
     policies = {
-      verify = {
-        skip = true
-      }
-      validate = {
-        skip = true
-      }
     }
   })
 }

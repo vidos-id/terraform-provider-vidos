@@ -90,15 +90,6 @@ resource "vidos_authorizer_instance" "main" {
           }
         }
       }
-
-      # This example focuses on validation; keep verification disabled.
-      verify = {
-        skip = true
-        verifier = {
-          type = "managed"
-        }
-      }
-    }
   })
 }
 
@@ -121,17 +112,6 @@ resource "vidos_gateway_instance" "main" {
         serviceRole = {
           owner      = "managed"
           resourceId = "authorizer_all_actions"
-        }
-      }
-
-      # Requests to /validate/* are forwarded to the validator instance.
-      validate = {
-        type       = "instance"
-        service    = "validator"
-        resourceId = vidos_validator_instance.main.resource_id
-        serviceRole = {
-          owner      = "managed"
-          resourceId = "validator_all_actions"
         }
       }
     }

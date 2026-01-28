@@ -17,3 +17,19 @@ terraform.tfstate
 terraform.tfstate.backup
 .terraform.lock.hcl
 .terraform/
+
+# logs + env
+*.log
+.env*
+
+# editor
+.vscode/
+
+# go build/test artifacts
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+*.test
+*.out

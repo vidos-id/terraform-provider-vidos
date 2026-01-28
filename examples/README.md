@@ -38,7 +38,7 @@ terraform destroy
 
 ### Gateway + Authorizer + Validator example
 
-This example provisions a validator (with inline trusted issuer roots including example PEMs), an authorizer configured to use that validator, and a gateway that routes `/auth/*` to the authorizer and `/validate/*` directly to the validator.
+This example provisions a validator (with inline trusted issuer roots including example PEMs), an authorizer configured to use that validator, and a gateway that routes `/auth/*` to the authorizer.
 
 Guide: `docs/guides/gateway-authorizer-validator.md`
 
