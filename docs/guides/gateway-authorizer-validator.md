@@ -14,7 +14,6 @@ This guide explains the [`examples/gateway-authorizer-validator`](https://github
 - `vidos_authorizer_instance` configured to call the validator instance for validation
 - `vidos_gateway_instance` that routes:
   - `/auth/*` to the authorizer
-  - `/validate/*` directly to the validator
 
 Managed service roles are used for service-to-service authorization:
 

@@ -16,9 +16,6 @@ resource "vidos_validator_configuration" "example" {
 
   values = jsonencode({
     policies = {
-      trustedIssuer = {
-        skip = true
-      }
     }
   })
 }
