@@ -11,6 +11,7 @@ The Vidos Terraform provider enables management of decentralized identity, acces
 This provider is officially published to the [Terraform Registry](https://registry.terraform.io/providers/vidos-id/vidos) and is available for use in your Terraform configurations.
 
 - [Vidos Product Documentation](https://vidos.id/docs)
+- [Vidos Terraform Quickstart](https://vidos.id/docs/guides/management/terraform/quickstart/)
 - [GitHub Repository](https://github.com/vidos-id/terraform-provider-vidos)
 
 ## Example Usage
